@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Roblox</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            height: 150px;
+        }
+
+        .admin-panel {
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            width: 85%;
+            max-width: 1000px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background-color: #e9ecef;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ced4da;
+            padding-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .sidebar li:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            color: #007bff;
+        }
+
+        .content-area {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .content-area h2 {
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ced4da;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            background-color: #fff;
+            color: #495057;
+            box-sizing: border-box;
+            font-size: 1rem;]
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background-color: #0056b3;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .console-output {
+            background-color: #f8f9fa;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #28a745;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            max-height: 250px;
+            border: 1px solid #dee2e6;
+        }
+
+        .ban-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .ban-options label {
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="Roblox Logo.png" alt="Roblox Logo" class="logo">
+    </div>
+    <div class="admin-panel">
+        <div class="sidebar">
+            <h2>User & Debugging</h2>
+            <ul>
+                <li><a href="#users" onclick="showContent('users-content')">User Management</a></li>
+                <li><a href="#games" onclick="showContent('games-content')">Game Management</a></li>
+                <li><a href="#server" onclick="showContent('server-content')">Server Controls</a></li>
+                <li><a href="#console" onclick="showContent('console-content')">Console</a></li>
+            </ul>
+        </div>
+
+        <div class="content-area" id="users-content">
+            <h2>User Management</h2>
+            <div class="form-group">
+                <label for="ban-user">Ban User:</label>
+                <input type="text" id="ban-user" placeholder="Enter Username">
+                <div class="ban-options">
+                    <label for="ban-length">Ban Length (days):</label>
+                    <input type="number" id="ban-length" placeholder="e.g., 1" value="">
+                    <button onclick="banUser()">Ban (reason will be set automatically)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area" id="games-content" style="display: none;">
+            <h2>Game Management</h2>
+            <div class="form-group">
+                <label for="shutdown-game">Shutdown Game:</label>
+                <input type="number" id="shutdown-game" placeholder="Enter Game ID">
+                <button onclick="shutdownGame()">Shutdown</button>
+            </div>
+        </div>
+
+        <div class="content-area" id="server-content" style="display: none;">
+            <h2>Server Controls</h2>
+            <button onclick="restartServer()">Restart Server</button>
+        </div>
+
+        <div class="content-area" id="console-content" style="display: none;">
+            <h2>Console</h2>
+            <div class="form-group">
+                <label for="console-command">Enter Command:</label>
+                <input type="text" id="console-command" placeholder="e.g., server info">
+                <button onclick="executeCommand()">Execute</button>
+            </div>
+            <div class="console-output" id="console-output">
+                > Hello world!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showContent(id) {
+            const contentAreas = document.querySelectorAll('.content-area');
+            contentAreas.forEach(area => {
+                area.style.display = 'none';
+            });
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function banUser() {
+            const usernameInput = document.getElementById('ban-user');
+            const banLengthInput = document.getElementById('ban-length');
+            const username = usernameInput.value.trim();
+            const banLength = banLengthInput.value.trim();
+            if (username) {
+                alert(`Attempting to ban user: ${username} for ${banLength} days.`);
+                usernameInput.value = '';
+                banLengthInput.value = '';
+            } else {
+                alert('Please enter a username to ban.');
+            }
+        }
+
+        function shutdownGame() {
+            const gameIdInput = document.getElementById('shutdown-game');
+            const gameId = gameIdInput.value.trim();
+            if (gameId) {
+                alert(`Attempting to shutdown game ID: ${gameId}`);
+                gameIdInput.value = '';
+            } else {
+                alert('Please enter a Game ID to shutdown.');
+            }
+        }
+
+        function restartServer() {
+            alert('Attempting to restart the server...');
+        }
+
+        function executeCommand() {
+            const commandInput = document.getElementById('console-command');
+            const command = commandInput.value.trim();
+            const consoleOutput = document.getElementById('console-output');
+            if (command) {
+                consoleOutput.innerHTML += `\n> ${command}`;
+                setTimeout(() => {
+                    consoleOutput.innerHTML += `\n<span style="color: #007bff;">[Output] Executed command: ${command}</span>`;
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                }, 500);
+                commandInput.value = '';
+            } else {
+                alert('Please enter a command.');
+            }
+        }
+
+        showContent('users-content');
+    </script>
+</body>
+</html>
